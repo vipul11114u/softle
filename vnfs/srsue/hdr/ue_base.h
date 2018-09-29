@@ -128,6 +128,7 @@ typedef struct {
   std::string   ue_category_str;
   std::string   apn;
   expert_args_t expert;
+  int ue_port_defined; //vipul
 }all_args_t;
 
 typedef enum {

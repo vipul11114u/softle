@@ -51,6 +51,7 @@ namespace bpo = boost::program_options;
  *  Program arguments processing
  ***********************************************************************/
 string config_file;
+int GLOBAL_UE_PORT; // vipul
 
 void parse_args(all_args_t *args, int argc, char *argv[]) {
 
@@ -129,6 +130,7 @@ void parse_args(all_args_t *args, int argc, char *argv[]) {
     ("usim.imei", bpo::value<string>(&args->usim.imei), "USIM IMEI")
     ("usim.k", bpo::value<string>(&args->usim.k), "USIM K")
 
+    ("port.num", bpo::value<int>(&args->ue_port_defined)->default_value(-1), "Port number to listen on") //vipul
 
     /* Expert section */
     ("expert.ip_netmask",
@@ -450,6 +452,8 @@ void *sock_rx_dl(void *m)
   if (sockfd < 0)
     printf("ERROR opening socket\n");
 
+  portno = GLOBAL_UE_PORT; //vipul
+  printf("PORT RECEIVED = %d", portno);
   memset(&serveraddr, 0, sizeof(serveraddr));
   memset(&clientaddr, 0, sizeof(clientaddr));
   serveraddr.sin_family = AF_INET;
@@ -485,6 +489,8 @@ int main(int argc, char *argv[])
   srslte_debug_handle_crash(argc, argv);
 
   parse_args(&args, argc, argv);
+
+  GLOBAL_UE_PORT = args.ue_port_defined; //vipul
 
   srsue_instance_type_t type = LTE;
   ue_base *ue = ue_base::get_instance(type);

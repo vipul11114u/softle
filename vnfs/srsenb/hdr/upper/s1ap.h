@@ -115,6 +115,7 @@ private:
   struct    sockaddr_in mme_addr;   // MME address
   uint32_t  next_eNB_UE_S1AP_ID;    // Next ENB-side UE identifier
   uint16_t  next_ue_stream_id;      // Next UE SCTP stream identifier
+  int ue_identifier_key; // vipul
 
   // Protocol IEs sent with every UL S1AP message
   LIBLTE_S1AP_TAI_STRUCT        tai;
@@ -123,6 +124,8 @@ private:
   LIBLTE_S1AP_MESSAGE_S1SETUPRESPONSE_STRUCT s1setupresponse;
 
   std::map<uint16_t, ue_ctxt_t> ue_ctxt_map;
+  std::map<int, int> ue_port_num_map; // vipul
+  std::map<int, std::string> ue_ip_num_map; // vipul
   std::map<uint32_t, uint16_t>  enbid_to_rnti_map;
   int dl_sock_fd;
 

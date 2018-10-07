@@ -34,6 +34,7 @@
 #include "srsue/hdr/upper/nas.h"
 #include "srslte/common/security.h"
 #include "srslte/common/bcd_helpers.h"
+#include "srsue/hdr/ue.h"
 
 using namespace srslte;
 
@@ -217,18 +218,23 @@ void nas::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type)
 {
   socklen_t             serverlen;
   struct sockaddr_in    serveraddr;
+  char                  *ue_ip = "130.245.144.100"; // vipul //use inet_pton and inet_ntoa later
+  // char               *port_num = (char *)malloc(sizeof(uint8_t)); // vipul
   int                   bytes_sent = 0;
   char                  *temp = (char *)malloc(N_bytes+sizeof(uint8_t));
-
+  int                   port_num = GLOBAL_UE_PORT; // vipul
   *temp = msg_type;
-  memcpy(temp+sizeof(uint8_t), msg, N_bytes);  
+  // sprintf(port_num, "%d", GLOBAL_UE_PORT); // vipul
+  memcpy(temp+sizeof(uint8_t), &port_num, sizeof(port_num)); // vipul
+  memcpy(temp+sizeof(uint8_t)+sizeof(port_num), ue_ip, strlen(ue_ip)); //vipul
+  memcpy(temp+sizeof(uint8_t)+sizeof(port_num)+strlen(ue_ip), msg, N_bytes); // vipul
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   serveraddr.sin_port = htons(9999);
-  //serveraddr.sin_addr.s_addr = inet_addr("130.245.144.115");
-  serveraddr.sin_addr.s_addr = inet_addr("172.18.0.23");
+  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.100");
+  //serveraddr.sin_addr.s_addr = inet_addr("172.18.0.23");
 
-  bytes_sent = sendto(ul_sock_fd, temp, N_bytes+1, 0, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
+  bytes_sent = sendto(ul_sock_fd, temp, N_bytes+1+sizeof(port_num)+strlen(ue_ip), 0, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
   if (bytes_sent < 0)
     printf("ERROR in sendto");
 }

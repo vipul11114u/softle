@@ -26,6 +26,7 @@
 
 #include "srsenb/hdr/upper/s1ap.h"
 #include "srsenb/hdr/upper/common_enb.h"
+#include "srsenb/hdr/upper/rrc.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -566,7 +567,7 @@ void s1ap::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type)
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   serveraddr.sin_port = htons(9997);
-  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.115");
+  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.100");
   //serveraddr.sin_addr.s_addr = inet_addr("172.18.0.22");
 
   bytes_sent = sendto(dl_sock_fd, temp, N_bytes+1, 0, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
@@ -806,25 +807,44 @@ bool s1ap::handle_s1setupfailure(LIBLTE_S1AP_MESSAGE_S1SETUPFAILURE_STRUCT *msg)
 /*******************************************************************************
 /* S1AP message senders
 ********************************************************************************/
-
 void s1ap::handle_ulnastransport(char *msg, int len)
 {
   uint8_t msg_type = *msg;
-  ue_ctxt_map[1].eNB_UE_S1AP_ID = next_eNB_UE_S1AP_ID++;
-  ue_ctxt_map[1].stream_id      = 1;
-  ue_ctxt_map[1].release_requested = false;
-  enbid_to_rnti_map[ue_ctxt_map[1].eNB_UE_S1AP_ID] = 1;
+  int curr_ue_port_num; //vipul
+  char *curr_ue_ip = (char *)malloc(16); //vipul
 
+  ue_identifier_key++;
+  ue_ctxt_map[ue_identifier_key].eNB_UE_S1AP_ID = next_eNB_UE_S1AP_ID++;
+  ue_ctxt_map[ue_identifier_key].stream_id      = 1;
+  ue_ctxt_map[ue_identifier_key].release_requested = false;
+  enbid_to_rnti_map[ue_ctxt_map[ue_identifier_key].eNB_UE_S1AP_ID] = 1;
+
+  // vipul
+  printf("strlen(curr_ue_ip) = %d\n",strlen(curr_ue_ip));
+  printf("curr_ue_ip = %s\n",curr_ue_ip);
+  memcpy(&curr_ue_port_num, msg+sizeof(uint8_t), sizeof(curr_ue_port_num));
+  memcpy(curr_ue_ip, msg+sizeof(uint8_t)+sizeof(curr_ue_port_num), 16);
+  ue_port_num_map[ue_identifier_key] = curr_ue_port_num;
+  ue_ip_num_map[ue_identifier_key] = curr_ue_ip;
+  // vipul
+
+  printf("msg_type = %d and len = %d\n",msg_type,len);
+  printf("curr_ue_port_num = %d and ue_identifier_key = %d\n",curr_ue_port_num, ue_identifier_key);
+  printf("strlen(curr_ue_ip) = %d\n",strlen(curr_ue_ip));
+  printf("curr_ue_ip = %s\n",curr_ue_ip);
   srslte::byte_buffer_t *buf = pool_allocate;
-  memcpy(buf->msg, msg+sizeof(uint8_t), len-1);
-  buf->N_bytes = len;
+  memcpy(buf->msg, msg+sizeof(uint8_t)+sizeof(curr_ue_port_num)+strlen(curr_ue_ip), len-1-sizeof(curr_ue_port_num)-strlen(curr_ue_ip));
+  buf->N_bytes = len-1-sizeof(curr_ue_port_num)-strlen(curr_ue_ip);
+  printf("buf->N_bytes %d\n",buf->N_bytes);
+  //buf->N_bytes = len;
 
+  printf("SENDING FORWARD -----> \n");
   if (msg_type == 2) 
-    send_initialuemessage(1, buf, false);
+    send_initialuemessage(ue_identifier_key, buf, false);
   else if (msg_type == 1)
-    send_ulnastransport(1, buf);
+    send_ulnastransport(ue_identifier_key, buf);
   else if (msg_type == 0)
-    rrc->parse_ul_dcch(1, 1, buf);
+    rrc->parse_ul_dcch(ue_identifier_key, 1, buf);
   
 }
 

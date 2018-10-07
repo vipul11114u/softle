@@ -51,7 +51,7 @@ namespace bpo = boost::program_options;
  *  Program arguments processing
  ***********************************************************************/
 string config_file;
-int GLOBAL_UE_PORT; // vipul
+int GLOBAL_UE_PORT = 0; // vipul
 
 void parse_args(all_args_t *args, int argc, char *argv[]) {
 

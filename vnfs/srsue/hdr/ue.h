@@ -55,6 +55,8 @@
 
 #include "ue_metrics_interface.h"
 
+extern int GLOBAL_UE_PORT;
+
 namespace srsue {
 
 /*******************************************************************************

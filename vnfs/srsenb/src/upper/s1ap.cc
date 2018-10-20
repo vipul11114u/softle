@@ -561,13 +561,20 @@ void s1ap::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type)
   struct sockaddr_in    serveraddr;
   int                   bytes_sent = 0;
   char 			*temp = (char *)malloc(N_bytes+sizeof(uint8_t));
+  int i = 0;
+  printf("write_pdu_sock received msg = %s\n", msg);
+  printf("write_pdu_sock received N_bytes = %d\n", N_bytes);
+  for(i = 0 ; i<N_bytes ; i++){
+    printf("%c",*(msg+i));
+  }
+  printf("\n");
 
   *temp = msg_type;
   memcpy(temp+sizeof(uint8_t), msg, N_bytes);
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   serveraddr.sin_port = htons(9997);
-  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.100");
+  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.108");
   //serveraddr.sin_addr.s_addr = inet_addr("172.18.0.22");
 
   bytes_sent = sendto(dl_sock_fd, temp, N_bytes+1, 0, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
@@ -654,6 +661,9 @@ bool s1ap::handle_dlnastransport(LIBLTE_S1AP_MESSAGE_DOWNLINKNASTRANSPORT_STRUCT
     memcpy(pdu->msg, msg->NAS_PDU.buffer, msg->NAS_PDU.n_octets);
     pdu->N_bytes = msg->NAS_PDU.n_octets;
     //rrc->write_dl_info(rnti, pdu);
+    printf("handle_dlnastransport received rnti %d\n",msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID);
+    printf("handle_dlnastransport received port number %d\n",  ue_port_num_map[msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID]);
+    printf("handle_dlnastransport received ip number %s\n",  ue_ip_num_map[msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID].c_str());
     write_pdu_sock(pdu->msg, pdu->N_bytes, 1);
     return true;
   } else {
@@ -812,7 +822,14 @@ void s1ap::handle_ulnastransport(char *msg, int len)
   uint8_t msg_type = *msg;
   int curr_ue_port_num; //vipul
   char *curr_ue_ip = (char *)malloc(16); //vipul
-
+  int i = 0;
+  printf("First msg received %s\n",msg);
+  printf("First msg size received %d\n",strlen(msg));
+  for(i = 0 ; i<len ; i++){
+    printf("%c",*(msg+i));
+  }
+  printf("\n");
+  
   ue_identifier_key++;
   ue_ctxt_map[ue_identifier_key].eNB_UE_S1AP_ID = next_eNB_UE_S1AP_ID++;
   ue_ctxt_map[ue_identifier_key].stream_id      = 1;
@@ -826,6 +843,7 @@ void s1ap::handle_ulnastransport(char *msg, int len)
   memcpy(curr_ue_ip, msg+sizeof(uint8_t)+sizeof(curr_ue_port_num), 16);
   ue_port_num_map[ue_identifier_key] = curr_ue_port_num;
   ue_ip_num_map[ue_identifier_key] = curr_ue_ip;
+  printf("added to hashmap IP number %s\n",  ue_ip_num_map[ue_identifier_key].c_str());
   // vipul
 
   printf("msg_type = %d and len = %d\n",msg_type,len);
@@ -833,9 +851,11 @@ void s1ap::handle_ulnastransport(char *msg, int len)
   printf("strlen(curr_ue_ip) = %d\n",strlen(curr_ue_ip));
   printf("curr_ue_ip = %s\n",curr_ue_ip);
   srslte::byte_buffer_t *buf = pool_allocate;
-  memcpy(buf->msg, msg+sizeof(uint8_t)+sizeof(curr_ue_port_num)+strlen(curr_ue_ip), len-1-sizeof(curr_ue_port_num)-strlen(curr_ue_ip));
-  buf->N_bytes = len-1-sizeof(curr_ue_port_num)-strlen(curr_ue_ip);
+  memcpy(buf->msg, msg+sizeof(uint8_t)+sizeof(curr_ue_port_num)+strlen(curr_ue_ip)+1, len-1-sizeof(curr_ue_port_num)-strlen(curr_ue_ip)-1);
+  buf->N_bytes = len-1-sizeof(curr_ue_port_num)-strlen(curr_ue_ip)-1;
   printf("buf->N_bytes %d\n",buf->N_bytes);
+  printf("buf->msg %s\n",buf->msg);
+  printf("buf->msg length %d\n",strlen((char*)buf->msg));
   //buf->N_bytes = len;
 
   printf("SENDING FORWARD -----> \n");

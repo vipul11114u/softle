@@ -93,7 +93,7 @@ public:
   void handle_ulnastransport(char *msg, int len);
   void open_dl_sock();
   void close_dl_sock();
-  void write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type);
+  void write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type, std::string map_ip_num, int map_port_num); // vipul
 
 private:
   static const int S1AP_THREAD_PRIO = 65;

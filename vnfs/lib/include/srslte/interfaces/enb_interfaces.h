@@ -268,7 +268,7 @@ public:
   virtual bool user_link_lost(uint16_t rnti) = 0; 
   virtual void ue_ctxt_setup_complete(uint16_t rnti, LIBLTE_S1AP_MESSAGE_INITIALCONTEXTSETUPRESPONSE_STRUCT *res) = 0;
   virtual void ue_erab_setup_complete(uint16_t rnti, LIBLTE_S1AP_MESSAGE_E_RABSETUPRESPONSE_STRUCT *res) = 0;
-  virtual void write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type) = 0;
+  virtual void write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type, std::string map_ip_num, int map_port_num) = 0;
   // virtual void ue_capabilities(uint16_t rnti, LIBLTE_RRC_UE_EUTRA_CAPABILITY_STRUCT *caps) = 0;
 };
 

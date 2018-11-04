@@ -1619,7 +1619,7 @@ void rrc::ue::send_dl_dcch(LIBLTE_RRC_DL_DCCH_MSG_STRUCT *dl_dcch_msg, byte_buff
                           liblte_rrc_dl_dcch_msg_type_text[dl_dcch_msg->msg_type]);
     
     //parent->pdcp->write_sdu(rnti, RB_ID_SRB1, pdu);
-    parent->s1ap->write_pdu_sock(pdu->msg, pdu->N_bytes, 0);
+    parent->s1ap->write_pdu_sock(pdu->msg, pdu->N_bytes, 0, "", 0);
     
   } else {
     parent->rrc_log->error("Allocating pdu\n");

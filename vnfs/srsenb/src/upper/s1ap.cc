@@ -555,13 +555,14 @@ bool s1ap::handle_s1ap_rx_pdu(srslte::byte_buffer_t *pdu)
   return true;
 }
 
-void s1ap::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type)
+void s1ap::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type, string map_ip_num = "", int map_port_num = 9999)
 {
   socklen_t             serverlen;
   struct sockaddr_in    serveraddr;
   int                   bytes_sent = 0;
   char 			*temp = (char *)malloc(N_bytes+sizeof(uint8_t));
   int i = 0;
+  //vipul write_pdu_sock
   printf("write_pdu_sock received msg = %s\n", msg);
   printf("write_pdu_sock received N_bytes = %d\n", N_bytes);
   for(i = 0 ; i<N_bytes ; i++){
@@ -573,8 +574,8 @@ void s1ap::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type)
   memcpy(temp+sizeof(uint8_t), msg, N_bytes);
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
-  serveraddr.sin_port = htons(9997);
-  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.108");
+  serveraddr.sin_port = htons(map_port_num);
+  serveraddr.sin_addr.s_addr = inet_addr(map_ip_num.c_str());
   //serveraddr.sin_addr.s_addr = inet_addr("172.18.0.22");
 
   bytes_sent = sendto(dl_sock_fd, temp, N_bytes+1, 0, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
@@ -661,10 +662,11 @@ bool s1ap::handle_dlnastransport(LIBLTE_S1AP_MESSAGE_DOWNLINKNASTRANSPORT_STRUCT
     memcpy(pdu->msg, msg->NAS_PDU.buffer, msg->NAS_PDU.n_octets);
     pdu->N_bytes = msg->NAS_PDU.n_octets;
     //rrc->write_dl_info(rnti, pdu);
+    //vipul
     printf("handle_dlnastransport received rnti %d\n",msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID);
     printf("handle_dlnastransport received port number %d\n",  ue_port_num_map[msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID]);
     printf("handle_dlnastransport received ip number %s\n",  ue_ip_num_map[msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID].c_str());
-    write_pdu_sock(pdu->msg, pdu->N_bytes, 1);
+    write_pdu_sock(pdu->msg, pdu->N_bytes, 1, ue_ip_num_map[msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID], ue_port_num_map[msg->eNB_UE_S1AP_ID.ENB_UE_S1AP_ID]);
     return true;
   } else {
     s1ap_log->error("Fatal Error: Couldn't allocate buffer in s1ap::run_thread().\n");

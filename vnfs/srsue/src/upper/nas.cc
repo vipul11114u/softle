@@ -691,7 +691,7 @@ void nas::parse_authentication_request(uint32_t lcid, byte_buffer_t *pdu) {
     nas_log->error("NAS mapped security context not currently supported\n");
     nas_log->console("Warning: NAS mapped security context not currently supported\n");
   }
-
+  net_valid = true;  // vipul
   if (net_valid) {
     nas_log->info("Network authentication successful\n");
     for (int i = 0; i < 8; i++) {

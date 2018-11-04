@@ -1,0 +1,53 @@
+import sys
+import subprocess
+total_files = int(sys.argv[2])
+# print total_files
+global_num = 1
+in_file_name = ''
+while global_num <= total_files:
+    # print global_num, "->" ,total_files
+    if(len(in_file_name) == 0):
+        in_file_name = sys.argv[1]
+    else:
+        in_file_name = out_file_name
+    # print 'infile', in_file_name
+    with open(in_file_name, "rt") as fin:
+        out_file_name = sys.argv[1][0:7] + str(global_num) + '.conf'
+        # print out_file_name
+        #with open(sys.argv[2], "wt") as fout:
+        with open(out_file_name, "wt") as fout:
+            for line in fin:
+                if 'num =' in line:
+                    line = line.strip()
+                    port = line[-4:]
+                    new_port = (int(port) + 1) % 9999
+                    line = line.replace(port, str(new_port)) + '\n'
+                    line = '0' * (4 - len(line)) + line
+                if 'op   =' in line:
+                    line = line.strip()
+                    op = line[-32:]
+                    val = int(op, base=16)
+                    line = line.replace(op, str(hex(val + 1))[2:-1]) + '\n'
+                    line = '0' * (32 - len(line)) + line
+                if 'k    =' in line:
+                    line = line.strip()
+                    k = line[-32:]
+                    val = int(k, base=16)
+                    line = line.replace(k, str(hex(val + 1))[2:-1]) + '\n'
+                    line = '0' * (32 - len(line)) + line
+                if 'imsi =' in line:
+                    line = line.strip()
+                    ismi = line[-15:]
+                    num = int(ismi)
+                    num = (num + 1) % 999999999999999
+                    # val = format(num, '%014d')
+                    val = str(num)
+                    line = line.replace(ismi, val) + '\n'
+                    line = '0' * (15 - len(line)) + line
+                fout.write(line)
+    fout.close
+    fin.close
+    args = ("srsue", out_file_name)
+    popen = subprocess.Popen(args)
+    #popen.wait()
+    global_num+=1

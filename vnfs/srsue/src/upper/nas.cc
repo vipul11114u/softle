@@ -234,8 +234,8 @@ void nas::write_pdu_sock(uint8_t *msg, int N_bytes, uint8_t msg_type)
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   serveraddr.sin_port = htons(9999);
-  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.108");
-  //serveraddr.sin_addr.s_addr = inet_addr("172.18.0.23");
+  //serveraddr.sin_addr.s_addr = inet_addr("130.245.144.108");
+  serveraddr.sin_addr.s_addr = inet_addr("172.18.0.23");
 
   printf("final temp to be sent = %s\n", temp);
   printf("size of temp to be sent = %d\n", sizeof(*temp));

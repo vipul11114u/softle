@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import time
 
 hss_file_loc = '../srsepc/hss.conf'
 user_db_file_loc = '../srsepc/user_db.csv'
@@ -12,3 +13,4 @@ while global_num <= total_files:
     args = ("srsue", out_file_name)
     popen = subprocess.Popen(args)
     global_num += 1
+    time.sleep(1)

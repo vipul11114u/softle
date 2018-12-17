@@ -469,8 +469,8 @@ void *sock_rx_ul(void *m)
   memset(&serveraddr, 0, sizeof(serveraddr));
   memset(&clientaddr, 0, sizeof(clientaddr));
   serveraddr.sin_family = AF_INET;
-  //serveraddr.sin_addr.s_addr = INADDR_ANY;
-  serveraddr.sin_addr.s_addr = inet_addr("130.245.144.108");
+  serveraddr.sin_addr.s_addr = INADDR_ANY;
+  //serveraddr.sin_addr.s_addr = inet_addr("130.245.144.108");
   serveraddr.sin_port = htons(portno);
 
   if (bind(sockfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) 

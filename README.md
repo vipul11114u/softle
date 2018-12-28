@@ -1,4 +1,4 @@
-#AutoNF
+# AutoNF
 Automating the life cycle of virtual network functions - A monolithic implementation
 
 ## Goal
